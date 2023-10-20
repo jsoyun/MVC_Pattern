@@ -7,7 +7,7 @@ import java.sql.Statement; //쿼리문날려줄때!
 
 public class DBManager {
 
-    public Connection getConnect(){
+    public static Connection getConnect(){
 
         Connection conn = null;
         Statement stmt = null;
@@ -44,7 +44,7 @@ public class DBManager {
 
     }
     //select를 수행한 후 연결끊기, 왜냐면 result 값이 있으니까!
-    public void Close( Connection conn ,Statement stmt, ResultSet rs ){
+    public static void Close( Connection conn ,Statement stmt, ResultSet rs ){
         try{
             if (conn != null) conn.close();
             if (stmt !=null) stmt.close();
@@ -58,7 +58,7 @@ public class DBManager {
 
     }
     //DML( insert, update, delete ) 를 수행하고 리소스 해제
-    public void Close( Connection conn ,Statement stmt ){
+    public  static void Close( Connection conn ,Statement stmt ){
         try{
             if (conn != null) conn.close();
             if (stmt !=null) stmt.close();

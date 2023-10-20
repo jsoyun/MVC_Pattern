@@ -12,9 +12,10 @@
 </head>
 <body>
 ㅇㄹㅇㄹㅇㄹ
-<form action="test.do" >
+<form action="BoardServlet" method="get" name="command"  >
     <input type="submit" value="전송">
 </form>
+<a href="BoardServlet?command=board_list">리스트로 가줘</a>
 
 </body>
 </html>

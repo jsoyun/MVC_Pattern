@@ -11,6 +11,7 @@ public class BoardDAO {
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
+//    DBManager dbManager = new DBManager();
 
     private BoardDAO(){
 
@@ -20,15 +21,11 @@ public class BoardDAO {
         return  new BoardDAO();
     }
 
-    //연결
-
-    //값을 저장한 List를 반환!
     //최근 등록한 게시물이 먼저 나오도록 게시글 목록을 출력한다.
     public List<BoardVO> selectAllBoards(){
-        DBManager dbManager = new DBManager(); //근데 이 인스턴스 계속 생성해도 되려나?
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         List<BoardVO> boardVOList = new ArrayList<>(); //null로 초기화하면 안됨!
-        BoardVO bVo = new BoardVO();
+//        BoardVO bVo = new BoardVO(); 여기서 초기화하면 모든 레코드가 같은 BoardVO 객체를 참조하게 됩니다. 따라서 마지막 레코드의 값만이 반복적으로 출력됩니다.
 
    try{
        //sql문으로 게시글 목록 가져옴
@@ -37,6 +34,7 @@ public class BoardDAO {
        rs =stmt.executeQuery();
 
        while (rs.next()){
+           BoardVO bVo = new BoardVO(); //아 여기서 초기화를 해야되는구나!!!!
            bVo.setNum(rs.getInt("num"));
            bVo.setPass(rs.getString("pass"));
            bVo.setName(rs.getString("name"));
@@ -55,7 +53,7 @@ public class BoardDAO {
 
    } finally {
        System.out.println("selectAllBoards 실행완료");
-       dbManager.Close(conn, stmt,rs);
+       DBManager.Close(conn, stmt,rs);
        System.out.println("selectAllBoards 실행 후 연결끊음");
 
 
@@ -69,10 +67,9 @@ public class BoardDAO {
         //디비 연결하고
         String sql ="insert into board (pass,name, email,title,content, writedate) values (?,?,?,?,?,?)";
         //set으로 테이블에 삽입
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         try{
-             stmt =conn.prepareStatement(sql);
+            stmt =conn.prepareStatement(sql);
             stmt.setString(1, bVo.getPass());
             stmt.setString(2, bVo.getName());
             stmt.setString(3, bVo.getEmail());
@@ -88,7 +85,7 @@ public class BoardDAO {
             e.printStackTrace();
         }finally {
             System.out.println("insert완료");
-            dbManager.Close(conn,stmt);
+            DBManager.Close(conn,stmt);
             System.out.println("insert 후 연결해제");
 
         }
@@ -99,8 +96,7 @@ public class BoardDAO {
     public void updateReadCount(String num){
         //이코드도 상당히 반복되는데..
 
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
 
 
         //num 가져와야겠네
@@ -127,13 +123,15 @@ public class BoardDAO {
             stmt.setString(1,String.valueOf(readcount));
             stmt.setString(2, num);
 
+           stmt.executeUpdate();
+
 
 
         } catch (Exception e){
             e.printStackTrace();
         }finally {
             System.out.println("조회수 update 완료");
-            dbManager.Close(conn,stmt,rs);
+            DBManager.Close(conn,stmt,rs);
             System.out.println("조회수 update 후 연결해제");
 
         }
@@ -143,8 +141,7 @@ public class BoardDAO {
     //board 테이블에서 게시글 번호로 해당 게시글을 찾아 게시글 정보를 BoardVO 객체로 넣어준다.
     public BoardVO selectOneBoardByNum (String num){
 
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         String sql="select * from board where num= ?" ;
         BoardVO bVo = new BoardVO();
         try{
@@ -168,7 +165,7 @@ public class BoardDAO {
             e.printStackTrace();
         } finally {
             System.out.println("조회수 update 완료");
-            dbManager.Close(conn,stmt,rs);
+            DBManager.Close(conn,stmt,rs);
             System.out.println("조회수 update 후 연결해제");
 
         }
@@ -180,27 +177,31 @@ public class BoardDAO {
     public void updateBoard(BoardVO bVo){
         //그러면 받은 값이랑 다르면 업데이트해? 아니면 무조건 업데이트?
 
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         String sql = "UPDATE board\n" +
-                "SET readcount = ?, name =?, content = ?\n" +
+                "SET pass=?,name =?,email=?, title=?, content = ?,writedate=?" +
                 "WHERE num = ?";
 
        try{
            stmt = conn.prepareStatement(sql);
-           stmt.setInt(1, bVo.getReadcount());
+           stmt.setString(1,bVo.getPass());
            stmt.setString(2, bVo.getName());
-           stmt.setString(3,bVo.getContent());
-           stmt.setInt(4,bVo.getNum());
+           stmt.setString(3, bVo.getEmail());
+           stmt.setString(4, bVo.getTitle());
+           stmt.setString(5, bVo.getContent());
+           stmt.setTimestamp(6, bVo.getWritedate());
+           stmt.setInt(7,bVo.getNum()); //  값이 없을 텐데 에러가 안나네?
+           System.out.println("bVo.getNum()"+bVo.getNum()); //bVo.getNum()0 오잉 0값으로 들어가네?
 
            stmt.executeUpdate();
 
 
        } catch (Exception e){
+           e.printStackTrace();
 
        } finally {
            System.out.println("VO 받은 값으로 update 완료");
-           dbManager.Close(conn,stmt);
+           DBManager.Close(conn,stmt);
            System.out.println("VO 받은 값으로 update 후 연결해제");
 
        }
@@ -211,8 +212,7 @@ public class BoardDAO {
 
     //테이블에서 비번과 번호가 일치한 정보를 찾아서 VO객체로 리턴한다.
     public BoardVO checkPassword(String pass, String num){
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         BoardVO vo = new BoardVO();
         String sql ="SELECT * FROM board WHERE pass = ? AND num = ?";
        try{
@@ -238,7 +238,7 @@ public class BoardDAO {
 
        }finally {
            System.out.println("checkPassword 완료");
-           dbManager.Close(conn,stmt,rs);
+           DBManager.Close(conn,stmt,rs);
            System.out.println("checkPassword 후 연결해제");
 
        }
@@ -247,8 +247,7 @@ public class BoardDAO {
 
     //게시글 번호에 해당하는 테이블 정보 삭제한다
     public void deleteBoard(String num){
-        DBManager dbManager = new DBManager();
-        Connection conn = dbManager.getConnect();
+        Connection conn = DBManager.getConnect();
         String sql ="delete from board where num =?";
         try{
             stmt = conn.prepareStatement(sql);
@@ -261,7 +260,7 @@ public class BoardDAO {
         }
         finally {
             System.out.println("deleteBoard 완료");
-            dbManager.Close(conn,stmt);
+            DBManager.Close(conn,stmt);
             System.out.println("deleteBoard 후 연결해제");
 
         }
