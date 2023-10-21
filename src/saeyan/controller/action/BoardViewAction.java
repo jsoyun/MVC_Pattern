@@ -15,20 +15,10 @@ public class BoardViewAction implements Action{
     public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String num =request.getParameter("num");
         BoardDAO bDao = BoardDAO.getInstance();
-        //엇 여기서 readcount 수 높여야되지 않나? 상세 보기 하면 추가되는 작e동!
+
         bDao.updateReadCount(num);
         BoardVO oneBoardByNum = bDao.selectOneBoardByNum(num);
-        request.setAttribute("board", oneBoardByNum);
-
-
-//    아 밑에 작업 필요 없구나!!
-//        request.setAttribute("name",oneBoardByNum.getName());
-//        request.setAttribute("pass",oneBoardByNum.getPass());
-//        request.setAttribute("email",oneBoardByNum.getEmail());
-//        request.setAttribute("title",oneBoardByNum.getTitle());
-//
-//        request.setAttribute("readcound",oneBoardByNum.getReadcount());
-//        request.setAttribute("writedate",oneBoardByNum.getWritedate());
+        request.setAttribute("board", oneBoardByNum); //board 객체로 속성값 설정하기!!
 
 
         String url ="board/boardView.jsp";

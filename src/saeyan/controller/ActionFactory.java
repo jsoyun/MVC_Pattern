@@ -40,6 +40,13 @@ public class ActionFactory  {
             action = new BoardCheckPassFormAction();
         } else if (command.equals("board_check_pass")){
             action = new BoardCheckPassAction();
+        } else if (command.equals("board_update_form")){
+            action = new BoardUpdateFromAction();
+        } else if(command.equals("board_update")){
+            action = new BoardUpdateAction();
+        }
+        else if (command.equals("board_delete")){
+            action = new BoardDeleteAction();
         }
         return action;
     }

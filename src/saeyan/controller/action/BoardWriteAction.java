@@ -17,6 +17,7 @@ public class BoardWriteAction implements Action {
         //얘는 데이터베이스와 연결되는구나.
 
         BoardVO bVO = new BoardVO();
+
         bVO.setName(request.getParameter("name"));
         bVO.setPass(request.getParameter("pass"));
         bVO.setEmail(request.getParameter("email"));

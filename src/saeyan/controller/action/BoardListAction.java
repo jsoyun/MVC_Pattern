@@ -26,13 +26,7 @@ public class BoardListAction implements Action {
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(jspUrl);
         requestDispatcher.forward(request, response);
 
-//       String command=  request.getParameter("command");
-//        ActionFactory af = ActionFactory.getInstance();
-//        Action action = af.getAction(command);
-//        action.execute(request,response);
-
     }
-    //BoardServlet 에서 command가 리스트라서 여기로 오면
-    //ActionFactory가 command에 따라서 실행하는거 아닐까? 객체 생성을...어떤 객체를 생성하는데? 액션 객체를 생성하겠지?
+
 
 }
